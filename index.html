@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Coming Soon — The Marketplace</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --orange: #FF5E00;
+      --orange-glow: #FF8C00;
+      --orange-dim: #c44700;
+      --black: #0A0A0A;
+      --dark: #111111;
+      --mid: #1a1a1a;
+      --text: #f0f0f0;
+      --muted: #888;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--black);
+      color: var(--text);
+      font-family: 'Barlow', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE GRAIN OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0.4;
+    }
+
+    /* ── BACKGROUND RADIAL GLOW ── */
+    .bg-glow {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 50% 110%, rgba(255,94,0,0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 30% at 80% 20%, rgba(255,94,0,0.06) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── GRID LINES ── */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,94,0,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,94,0,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── LAYOUT ── */
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      gap: 0;
+    }
+
+    /* ── LOGO / BRAND ── */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 60px;
+      animation: fadeDown 0.8s ease both;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--orange);
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      animation: pulse-icon 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse-icon {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255,94,0,0); }
+      50% { filter: brightness(1.2); }
+    }
+
+    .brand-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.2em;
+      color: var(--text);
+    }
+
+    .brand-name span { color: var(--orange); }
+
+    /* ── HEADLINE ── */
+    .headline-wrap {
+      text-align: center;
+      margin-bottom: 24px;
+      animation: fadeDown 0.9s 0.1s ease both;
+    }
+
+    .eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .eyebrow::before, .eyebrow::after {
+      content: '';
+      display: block;
+      width: 30px;
+      height: 1px;
+      background: var(--orange);
+      opacity: 0.6;
+    }
+
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4rem, 12vw, 9rem);
+      line-height: 0.9;
+      letter-spacing: 0.02em;
+      color: var(--text);
+      text-shadow: 0 0 80px rgba(255,94,0,0.15);
+    }
+
+    h1 .highlight {
+      color: var(--orange);
+      display: block;
+      -webkit-text-stroke: 0px;
+      text-shadow:
+        0 0 40px rgba(255,94,0,0.5),
+        0 0 80px rgba(255,94,0,0.2);
+    }
+
+    .sub {
+      font-size: clamp(0.9rem, 2vw, 1.05rem);
+      font-weight: 300;
+      color: var(--muted);
+      max-width: 420px;
+      line-height: 1.7;
+      text-align: center;
+      margin: 20px auto 60px;
+      animation: fadeDown 1s 0.2s ease both;
+    }
+
+    /* ── COUNTDOWN ── */
+    .countdown {
+      display: flex;
+      gap: clamp(16px, 4vw, 48px);
+      align-items: flex-start;
+      justify-content: center;
+      margin-bottom: 70px;
+      animation: fadeUp 1s 0.4s ease both;
+    }
+
+    .unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .unit-box {
+      position: relative;
+      width: clamp(70px, 16vw, 130px);
+      height: clamp(80px, 18vw, 148px);
+      background: var(--mid);
+      border: 1px solid rgba(255,94,0,0.18);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* shine line */
+    .unit-box::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,94,0,0.5), transparent);
+    }
+
+    /* flip line */
+    .unit-box::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 0; right: 0;
+      height: 1px;
+      background: rgba(0,0,0,0.4);
+    }
+
+    .unit-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.8rem, 9vw, 6rem);
+      color: var(--text);
+      line-height: 1;
+      transition: color 0.15s;
+    }
+
+    .unit-num.tick {
+      color: var(--orange);
+    }
+
+    .unit-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .sep {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 8vw, 5.5rem);
+      color: rgba(255,94,0,0.3);
+      line-height: 1;
+      padding-top: clamp(12px, 3vw, 24px);
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.15; } }
+
+    /* ── EMAIL FORM ── */
+    .notify {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      max-width: 420px;
+      animation: fadeUp 1s 0.6s ease both;
+      margin-bottom: 60px;
+    }
+
+    .notify p {
+      font-size: 0.78rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .notify-row {
+      display: flex;
+      width: 100%;
+      gap: 0;
+      border: 1px solid rgba(255,94,0,0.3);
+      border-radius: 3px;
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+
+    .notify-row:focus-within {
+      border-color: var(--orange);
+      box-shadow: 0 0 20px rgba(255,94,0,0.1);
+    }
+
+    .notify-row input {
+      flex: 1;
+      background: rgba(255,255,255,0.03);
+      border: none;
+      outline: none;
+      padding: 14px 18px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text);
+      min-width: 0;
+    }
+
+    .notify-row input::placeholder { color: #555; }
+
+    .notify-row button {
+      background: var(--orange);
+      color: #fff;
+      border: none;
+      padding: 14px 22px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .notify-row button:hover { background: var(--orange-glow); }
+
+    .success-msg {
+      display: none;
+      font-size: 0.82rem;
+      color: var(--orange);
+      letter-spacing: 0.1em;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      position: absolute;
+      bottom: 24px;
+      left: 0; right: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 32px;
+      animation: fadeUp 1s 0.8s ease both;
+    }
+
+    .footer a {
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer a:hover { color: var(--orange); }
+
+    /* ── DECORATIVE CORNER MARKS ── */
+    .corner {
+      position: fixed;
+      width: 28px;
+      height: 28px;
+      border-color: rgba(255,94,0,0.3);
+      border-style: solid;
+    }
+
+    .corner-tl { top: 24px; left: 24px; border-width: 1px 0 0 1px; }
+    .corner-tr { top: 24px; right: 24px; border-width: 1px 1px 0 0; }
+    .corner-bl { bottom: 24px; left: 24px; border-width: 0 0 1px 1px; }
+    .corner-br { bottom: 24px; right: 24px; border-width: 0 1px 1px 0; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 480px) {
+      .sep { display: none; }
+      .footer { gap: 18px; flex-wrap: wrap; padding: 0 20px; }
+      .corner { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+<div class="bg-grid"></div>
+
+<!-- Corner decorations -->
+<div class="corner corner-tl"></div>
+<div class="corner corner-tr"></div>
+<div class="corner corner-bl"></div>
+<div class="corner corner-br"></div>
+
+<main class="page">
+
+  <!-- Brand -->
+  <div class="brand">
+    <div class="brand-icon"></div>
+    <div class="brand-name">MARKET<span>X</span></div>
+  </div>
+
+  <!-- Headline -->
+  <div class="headline-wrap">
+    <div class="eyebrow">Something big is coming</div>
+    <h1>
+      COMING<br>
+      <span class="highlight">SOON</span>
+    </h1>
+  </div>
+
+  <p class="sub">
+    We're building the marketplace that changes everything.
+    Be the first to know when we go live.
+  </p>
+
+  <!-- Countdown -->
+  <div class="countdown" id="countdown">
+    <div class="unit">
+      <div class="unit-box"><span class="unit-num" id="days">365</span></div>
+      <span class="unit-label">Days</span>
+    </div>
+    <div class="sep">:</div>
+    <div class="unit">
+      <div class="unit-box"><span class="unit-num" id="hours">00</span></div>
+      <span class="unit-label">Hours</span>
+    </div>
+    <div class="sep">:</div>
+    <div class="unit">
+      <div class="unit-box"><span class="unit-num" id="minutes">00</span></div>
+      <span class="unit-label">Minutes</span>
+    </div>
+    <div class="sep">:</div>
+    <div class="unit">
+      <div class="unit-box"><span class="unit-num" id="seconds">00</span></div>
+      <span class="unit-label">Seconds</span>
+    </div>
+  </div>
+
+  <!-- Notify form -->
+  <div class="notify">
+    <p>Notify me when it launches</p>
+    <div class="notify-row">
+      <input type="email" id="email-input" placeholder="Enter your email address" />
+      <button onclick="handleNotify()">Notify Me</button>
+    </div>
+    <span class="success-msg" id="success-msg">✓ &nbsp;You're on the list. We'll be in touch.</span>
+  </div>
+
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+  <a href="#">About</a>
+  <a href="#">Contact</a>
+  <a href="#">Privacy</a>
+  <a href="#">Instagram</a>
+</footer>
+
+<script>
+  // ── COUNTDOWN ──
+  // Launch date: exactly 1 year from page load
+  // Change this to a fixed date once you decide your launch date, e.g.:
+  // const LAUNCH = new Date('2026-05-25T00:00:00');
+  const LAUNCH = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function tick() {
+    const now = Date.now();
+    const diff = LAUNCH - now;
+
+    if (diff <= 0) {
+      document.getElementById('days').textContent = '00';
+      document.getElementById('hours').textContent = '00';
+      document.getElementById('minutes').textContent = '00';
+      document.getElementById('seconds').textContent = '00';
+      return;
+    }
+
+    const days    = Math.floor(diff / 86400000);
+    const hours   = Math.floor((diff % 86400000) / 3600000);
+    const minutes = Math.floor((diff % 3600000)  / 60000);
+    const seconds = Math.floor((diff % 60000)    / 1000);
+
+    const secEl = document.getElementById('seconds');
+    secEl.textContent = pad(seconds);
+    secEl.classList.add('tick');
+    setTimeout(() => secEl.classList.remove('tick'), 150);
+
+    document.getElementById('days').textContent    = pad(days);
+    document.getElementById('hours').textContent   = pad(hours);
+    document.getElementById('minutes').textContent = pad(minutes);
+  }
+
+  tick();
+  setInterval(tick, 1000);
+
+  // ── NOTIFY FORM ──
+  function handleNotify() {
+    const input = document.getElementById('email-input');
+    const msg   = document.getElementById('success-msg');
+    if (!input.value || !input.value.includes('@')) {
+      input.style.borderLeft = '2px solid var(--orange)';
+      setTimeout(() => input.style.borderLeft = '', 600);
+      return;
+    }
+    input.closest('.notify-row').style.display = 'none';
+    msg.style.display = 'block';
+    // TODO: wire up to your email service (Mailchimp, ConvertKit, etc.)
+  }
+</script>
+</body>
+</html>
